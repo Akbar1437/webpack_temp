@@ -13,6 +13,18 @@ module.exports = {
     filename: "[name].[contenthash].js",
     path: path.resolve(__dirname, "dist"),
   },
+  resolve: {
+    extensions: [".js", ".json"],
+    alias: {
+      "@models": path.resolve(__dirname, "src/models"),
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+    },
+  },
   plugins: [
     new HTMLWebpackPlugin({
       template: "./index.html",
@@ -33,6 +45,14 @@ module.exports = {
       {
         test: /\.(ttf|woff|woff2|eot)$/,
         type: "asset/resource",
+      },
+      {
+        test: /\.xml$/,
+        use: ["xml-loader"],
+      },
+      {
+        test: /\.csv$/,
+        use: ["csv-loader"],
       },
     ],
   },
