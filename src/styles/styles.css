@@ -1,0 +1,9 @@
+.container {
+    padding-top: 2rem;
+    max-width: 100px;
+    margin: 0 auto
+}
+
+h1 {
+    font-style: oblique;
+}
