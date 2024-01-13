@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 const isDev = process.env.NODE_ENV === "development";
 const filename = (ext) => (isDev ? `[name].${ext}` : `[name].[hash].${ext}`);
@@ -35,13 +36,24 @@ const cssLoaders = (extra) => {
   return loaders;
 };
 
-console.log("isDev: ", isDev);
+const babelOptions = (preset) => {
+  const options = {
+    presets: ["@babel/preset-env"],
+  };
+
+  if (preset) {
+    options.presets.push(preset);
+  }
+
+  return options;
+};
+
 module.exports = {
   context: path.resolve(__dirname, "src"),
   mode: "development",
   entry: {
-    main: "./index.js",
-    analytics: "./analytics.js",
+    main: "./index.jsx",
+    analytics: "./analytics.ts",
   },
   output: {
     filename: filename("js"),
@@ -58,6 +70,7 @@ module.exports = {
   devServer: {
     port: 4200,
   },
+  devtool: isDev ? "source-map" : undefined,
   plugins: [
     new HTMLWebpackPlugin({
       template: "./index.html",
@@ -77,6 +90,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: filename("css"),
     }),
+    new ESLintPlugin(),
   ],
 
   module: {
@@ -114,9 +128,23 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env"],
-          },
+          options: babelOptions(),
+        },
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: babelOptions("@babel/preset-typescript"),
+        },
+      },
+      {
+        test: /\.jsx$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: babelOptions("@babel/preset-react"),
         },
       },
     ],
